@@ -1,0 +1,12 @@
+fold 1/5  tuned alpha=0.9 fuzzy width=1.5 gamma=4
+fold 2/5  tuned alpha=0.8 fuzzy width=1.5 gamma=4
+fold 3/5  tuned alpha=0.8 fuzzy width=1.5 gamma=4
+fold 4/5  tuned alpha=1.0 fuzzy width=1.5 gamma=4
+fold 5/5  tuned alpha=0.8 fuzzy width=1.5 gamma=4
+                       top1    top3  macro_f1  logloss   brier     ece
+model                                                                 
+Logistic Regression  0.9709  0.9991    0.9707   0.2102  0.0800  0.1288
+Random Forest        0.9950  1.0000    0.9950   0.0518  0.0145  0.0414
+XGBoost              0.9936  1.0000    0.9936   0.0289  0.0109  0.0137
+Rules only (fuzzy)   0.9905  1.0000    0.9904   0.4459  0.2187  0.3010
+Hybrid               0.9955  1.0000    0.9954   0.0929  0.0231  0.0785

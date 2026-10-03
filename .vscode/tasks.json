@@ -1,0 +1,8 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "Run app (streamlit)", "type": "shell", "command": "streamlit run app.py", "problemMatcher": [] },
+    { "label": "Step 8 evaluation", "type": "shell", "command": "python steps/step08_evaluation.py", "problemMatcher": [] },
+    { "label": "Steps 4-7 validation + demo", "type": "shell", "command": "python steps/step04_07_validation_and_demo.py", "problemMatcher": [] }
+  ]
+}

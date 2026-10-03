@@ -1,0 +1,137 @@
+validation fold 1/5 (9s)
+validation fold 2/5 (16s)
+validation fold 3/5 (29s)
+validation fold 4/5 (37s)
+validation fold 5/5 (45s)
+
+=== STEP 5 VALIDATION (out-of-fold) ===
+noise  0%: top1=0.9955 AUROC(conf vs correct)=0.992 acc non-borderline=0.998 acc borderline=0.615 (n=13) top-2 when borderline=1.000 errors caught by flag=5/10
+noise 20%: top1=0.8786 AUROC(conf vs correct)=0.841 acc non-borderline=0.942 acc borderline=0.602 (n=412) top-2 when borderline=0.867 errors caught by flag=164/267
+
+Accuracy by margin bin (20% noise):
+                  n   top1   top2
+bin                             
+(-0.001, 0.1]  228  0.548  0.868
+(0.1, 0.2]     185  0.665  0.859
+(0.2, 0.4]     377  0.836  0.939
+(0.4, 0.6]     431  0.926  0.977
+(0.6, 0.8]     426  0.988  0.998
+(0.8, 1.0]     553  0.995  0.998
+
+Accuracy by confidence band (20% noise):
+           n   top1
+band              
+HIGH    860  0.993
+LOW     524  0.656
+MEDIUM  816  0.901
+
+=== STEP 7 VALIDATION: halve N on N-sensitive held-out cases; can the engine restore 90% of the lost suitability? ===
+{'cases': 70, 'plan_found': np.float64(1.0), 'goal_met': np.float64(1.0), 'median_recommended_dN': np.float64(21.0), 'median_true_lost_N': np.float64(41.5), 'recommended_leq_lost': np.float64(1.0)}
+
+====================================================================================================
+FIELD A - moderate field (jute vs rice)
+====================================================================================================
+{'N': 85.0, 'P': 45.0, 'K': 40.0, 'temperature': 24.0, 'humidity': 82.0, 'ph': 6.3, 'rainfall': 190.0}
+
+[STEP 5] TRUST
+  rank       crop   SI  prob  tree_disagreement  SI_p10  SI_p90
+    1       jute 83.5 0.779              0.387    52.6    94.0
+    2       rice 26.5 0.208              0.387    12.1    47.9
+    3     coffee  6.6 0.008              0.000     3.6    19.0
+    4 watermelon  4.4 0.002              0.000     2.7     6.2
+    5    coconut  4.1 0.001              0.000     1.0     6.0
+ -> Confidence 69/100 (MEDIUM). jute clearly leads rice by 57 pts.
+
+[STEP 4] decision matrix (profit = ILLUSTRATIVE placeholder)
+           SI  water   risk  profit
+jute  83.500  1.000  0.901    0.35
+rice  26.492  0.988  0.920    0.50
+  balanced       -> jute(0.67) > rice(0.33)
+  risk_averse    -> jute(0.75) > rice(0.25)
+  profit_driven  -> rice(0.67) > jute(0.33)
+  water_scarce   -> jute(0.71) > rice(0.29)
+  rank-1 stability under random re-weighting: {'jute': '93%', 'rice': '7%'}
+
+[STEP 6] EXPLANATION
+  Jute: in ideal range: nitrogen 85 (ideal 63-91); phosphorus 45 (ideal 38-57); potassium 40 (ideal 35-44); temperature 24°C (ideal 23.28-26.57). Limiting factor: none - every provided factor is inside its ideal range. Strongest model drivers: rainfall (+0.21), nitrogen (+0.16), potassium (+0.14).
+
+[STEP 7] WHAT-IF (target +15 SI)
+  jute: SI 83.5 -> goal 98.5
+     already near the ceiling - gains are marginal
+  rice: SI 26.5 -> goal 41.5
+     plan (SI 44.8; under 5% input error 45.1): Add ~8 kg/ha N (~16 kg/ha urea).
+     plan (SI 67.6; under 5% input error 64.1): Lower soil pH by ~0.3 (from 6.3): elemental sulphur / acidifying fertiliser - get a lab dose.
+  NOTE: Approximate guidance only. Dataset N-P-K are relative levels, not lab-calibrated kg/ha; actual doses depend on soil test, soil texture, crop stage and local extension advice.
+
+====================================================================================================
+FIELD B - borderline field (pulses)
+====================================================================================================
+{'N': 32.4, 'P': 58.0, 'K': 19.5, 'temperature': 29.1, 'humidity': 74.4, 'ph': 7.0, 'rainfall': 59.6}
+
+[STEP 5] TRUST
+  rank      crop   SI  prob  tree_disagreement  SI_p10  SI_p90
+    1  mungbean 40.5 0.333              0.478    12.1    93.0
+    2    lentil 34.0 0.268              0.449     7.7    53.3
+    3 blackgram 31.9 0.246              0.437     8.6    69.2
+    4 mothbeans 17.1 0.098              0.286     8.6    23.4
+    5     maize 10.1 0.028              0.115     8.1    12.4
+ -> Confidence 29/100 (LOW). BORDERLINE: mungbean and lentil are nearly equal (gap 7 pts) - consider both.
+
+[STEP 4] decision matrix (profit = ILLUSTRATIVE placeholder)
+                SI  water   risk  profit
+mungbean   40.489  0.947  0.936    0.65
+lentil     34.026  0.727  0.925    0.60
+blackgram  31.904  0.841  0.930    0.55
+mothbeans  17.086  1.000  0.923    0.45
+  balanced       -> mungbean(0.92) > lentil(0.58) > blackgram(0.57) > mothbeans(0.31)
+  risk_averse    -> mungbean(0.92) > blackgram(0.58) > lentil(0.57) > mothbeans(0.32)
+  profit_driven  -> mungbean(0.97) > lentil(0.70) > blackgram(0.52) > mothbeans(0.15)
+  water_scarce   -> mungbean(0.84) > mothbeans(0.63) > blackgram(0.47) > lentil(0.30)
+  rank-1 stability under random re-weighting: {'mungbean': '100%', 'lentil': '0%', 'blackgram': '0%'}
+
+[STEP 6] EXPLANATION
+  Mungbean: in ideal range: nitrogen 32.4 (ideal 4-35.1); phosphorus 58 (ideal 37-59); potassium 19.5 (ideal 15-24); temperature 29.1°C (ideal 27.41-29.73) | acceptable: rainfall 59.6mm (ideal 38.08-58.01) (too high) | PROBLEM: humidity 74.4% (ideal 81.13-89.12) (too low). Limiting factor: humidity is too low. Strongest model drivers: rainfall (+0.12), potassium (+0.06), temperature (+0.06).
+
+[STEP 7] WHAT-IF (target +15 SI)
+  mungbean: SI 40.5 -> goal 55.5
+     goal NOT reachable. Limiting factor: humidity (climate - cannot be changed)
+  lentil: SI 34.0 -> goal 49.0
+     goal NOT reachable. Limiting factor: humidity (climate - cannot be changed)
+     best effort (SI 47.6): Add ~20 kg/ha P (~43 kg/ha DAP). Lower soil pH by ~0.9 (from 7.0): elemental sulphur / acidifying fertiliser - get a lab dose.
+  NOTE: Approximate guidance only. Dataset N-P-K are relative levels, not lab-calibrated kg/ha; actual doses depend on soil test, soil texture, crop stage and local extension advice.
+
+====================================================================================================
+FIELD C - rice, low N, acidic
+====================================================================================================
+{'N': 45.0, 'P': 47.0, 'K': 40.0, 'temperature': 23.7, 'humidity': 82.2, 'ph': 5.0, 'rainfall': 233.1}
+
+[STEP 5] TRUST
+  rank        crop   SI  prob  tree_disagreement  SI_p10  SI_p90
+    1        rice 40.8 0.364              0.476    26.8    40.2
+    2      papaya 29.5 0.276              0.461    18.4    39.6
+    3 pomegranate 17.4 0.129              0.347    13.7    21.1
+    4     coconut  9.8 0.052              0.225     4.2    15.3
+    5        jute  8.6 0.034              0.000     8.5    17.7
+ -> Confidence 25/100 (LOW). BORDERLINE: rice and papaya are nearly equal (gap 9 pts) - consider both.
+
+[STEP 4] decision matrix (profit = ILLUSTRATIVE placeholder)
+             SI  water   risk  profit
+rice    40.766    1.0  0.923    0.50
+papaya  29.523    1.0  0.999    0.65
+  balanced       -> rice(0.69) > papaya(0.31)
+  risk_averse    -> rice(0.84) > papaya(0.16)
+  profit_driven  -> papaya(0.63) > rice(0.37)
+  water_scarce   -> rice(0.76) > papaya(0.24)
+  rank-1 stability under random re-weighting: {'rice': '98%', 'papaya': '2%'}
+
+[STEP 6] EXPLANATION
+  Rice: in ideal range: phosphorus 47 (ideal 36-58); potassium 40 (ideal 36-44); temperature 23.7°C (ideal 20.87-26.47); humidity 82.2% (ideal 80.35-84.05) | acceptable: nitrogen 45 (ideal 62.9-95) (too low); soil pH 5 (ideal 5.38-7.48) (too low). Limiting factor: nitrogen is too low. Strongest model drivers: nitrogen (-0.13), rainfall (+0.13), humidity (+0.10).
+
+[STEP 7] WHAT-IF (target +15 SI)
+  rice: SI 40.8 -> goal 55.8
+     plan (SI 99.3; under 5% input error 98.1): Add ~15 kg/ha N (~33 kg/ha urea).
+  papaya: SI 29.5 -> goal 44.5
+     plan (SI 45.0; under 5% input error 44.4): Add ~8 kg/ha K (~12 kg/ha MOP (muriate of potash)). Raise soil pH by ~1.0 (from 5.0): ~2.0 t/ha agricultural lime (very rough).
+  NOTE: Approximate guidance only. Dataset N-P-K are relative levels, not lab-calibrated kg/ha; actual doses depend on soil test, soil texture, crop stage and local extension advice.
+
+Saved to /home/claude/final/crop_decision_system/outputs/step4_7
